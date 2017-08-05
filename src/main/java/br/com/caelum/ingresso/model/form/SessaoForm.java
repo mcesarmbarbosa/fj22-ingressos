@@ -6,8 +6,14 @@ import javax.validation.constraints.NotNull;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-public class SessaoForm {
+import br.com.caelum.ingresso.dao.FilmeDao;
+import br.com.caelum.ingresso.dao.SalaDao;
+import br.com.caelum.ingresso.model.Filme;
+import br.com.caelum.ingresso.model.Sala;
+import br.com.caelum.ingresso.model.Sessao;
 
+public class SessaoForm {
+	
 	private Integer id;
 	
 	@NotNull
@@ -17,6 +23,12 @@ public class SessaoForm {
 	@NotNull
 	private LocalTime horario;
 	
+	@NotNull
+	private Integer filmeId;
+	
+	public SessaoForm() {
+	}
+
 	public Integer getId() {
 		return id;
 	}
@@ -48,8 +60,14 @@ public class SessaoForm {
 	public void setFilmeId(Integer filmeId) {
 		this.filmeId = filmeId;
 	}
-
-	@NotNull
-	private Integer filmeId;
 	
+	public Sessao toSessao(SalaDao salaDao, FilmeDao filmeDao) {
+		Filme filme = filmeDao.findOne(filmeId);
+		Sala sala = salaDao.findOne(salaId);
+		
+		Sessao sessao = new Sessao(horario, filme, sala);
+		sessao.setId(id);
+		
+		return sessao;
+	}
 }
