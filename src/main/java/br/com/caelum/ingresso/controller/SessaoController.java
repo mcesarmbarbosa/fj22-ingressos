@@ -1,6 +1,7 @@
 package br.com.caelum.ingresso.controller;
 
 import java.time.LocalTime;
+import java.util.List;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -21,6 +22,7 @@ import br.com.caelum.ingresso.dao.SessaoDao;
 import br.com.caelum.ingresso.model.Filme;
 import br.com.caelum.ingresso.model.Sala;
 import br.com.caelum.ingresso.model.Sessao;
+import br.com.caelum.ingresso.validacao.GerenciadorDeSessao;
 
 @Controller
 public class SessaoController {
@@ -54,13 +56,21 @@ public class SessaoController {
 		
 		if (result.hasErrors()) return form(form.getSalaId(), form);
 		
-		   ModelAndView modelAndView = new ModelAndView("redirect:/admin/sala/"+form.getSalaId()+"/sessoes");
+//		   
 		   
 		   Sessao sessao = form.toSessao(salaDao, filmeDao);
 		   
-		   sessaoDao.save(sessao);
+		   List<Sessao> sessoesDaSala = sessaoDao.buscaSessoesDaSala(sessao.getSala());
 		   
-		   return modelAndView;
+		   GerenciadorDeSessao gerenciador = new GerenciadorDeSessao(sessoesDaSala);
+		   
+		   if (gerenciador.cabe(sessao)) {
+		      sessaoDao.save(sessao);
+		      return new ModelAndView("redirect:/admin/sala/"+form.getSalaId()+"/sessoes");
+		   }
+		   
+		   
+		   return form(form.getSalaId(), form);
 	}
 	
 	public class SessaoForm {
@@ -76,6 +86,9 @@ public class SessaoController {
 		
 		@NotNull
 		private Integer filmeId;
+		
+		public SessaoForm() {
+		}
 
 		public Integer getId() {
 			return id;
