@@ -36,10 +36,11 @@ public class Filme {
 
     }
     
-    public Filme(String nome, Duration duracao, String genero) {
+    public Filme(String nome, Duration duracao, String genero, BigDecimal preco) {
 		this.nome = nome;
 		this.duracao = duracao;
 		this.genero = genero;
+		this.preco = preco;
 	}
 
 	public Integer getId() {
